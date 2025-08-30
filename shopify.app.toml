@@ -2,7 +2,7 @@
 
 client_id = "6c4048a36955cddfca9ebc546c6d57f1"
 name = "jeet-dot-dev-banner-app"
-application_url = "https://soup-sm-booty-durham.trycloudflare.com"
+application_url = "https://pros-jersey-vancouver-announcement.trycloudflare.com"
 embedded = true
 handle = "jeet-dot-dev-banner-app"
 
@@ -26,7 +26,7 @@ api_version = "2025-07"
 scopes = "write_products"
 
 [auth]
-redirect_urls = ["https://soup-sm-booty-durham.trycloudflare.com/auth/callback", "https://soup-sm-booty-durham.trycloudflare.com/auth/shopify/callback", "https://soup-sm-booty-durham.trycloudflare.com/api/auth/callback"]
+redirect_urls = ["https://pros-jersey-vancouver-announcement.trycloudflare.com/auth/callback", "https://pros-jersey-vancouver-announcement.trycloudflare.com/auth/shopify/callback", "https://pros-jersey-vancouver-announcement.trycloudflare.com/api/auth/callback"]
 
 [pos]
 embedded = false

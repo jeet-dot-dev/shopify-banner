@@ -89,6 +89,24 @@
     }
   }
 
+  function resetBanner(bannerId) {
+    // Clear localStorage and show banner again
+    localStorage.removeItem('banner-closed-' + bannerId);
+    const banner = document.getElementById(bannerId);
+    if (banner) {
+      banner.style.display = 'block';
+      adjustBodyMargin();
+    }
+  }
+
+  // Add double-click to reset banner (for testing)
+  document.addEventListener('dblclick', function(e) {
+    if (e.ctrlKey || e.metaKey) {
+      resetBanner('promotion-banner-{{ block.id }}');
+      console.log('Banner reset - localStorage cleared');
+    }
+  });
+
   function adjustBodyMargin() {
     const banner = document.getElementById('promotion-banner-{{ block.id }}');
     if (banner && banner.style.display !== 'none') {
@@ -103,14 +121,31 @@
   document.addEventListener('DOMContentLoaded', function() {
     const bannerId = 'promotion-banner-{{ block.id }}';
     const wasClosed = localStorage.getItem('banner-closed-' + bannerId);
+    
+    // For debugging: log if banner was previously closed
+    console.log('Banner ID:', bannerId);
+    console.log('Was closed:', wasClosed);
+    console.log('Remember close setting:', {{ block.settings.remember_close | json }});
+    
     if (wasClosed === 'true' && {{ block.settings.remember_close | json }}) {
       const banner = document.getElementById(bannerId);
       if (banner) {
         banner.style.display = 'none';
+        console.log('Banner hidden due to localStorage');
       }
+    } else {
+      console.log('Banner should be visible');
     }
     // Adjust body margin on page load
     setTimeout(adjustBodyMargin, 100);
+  });
+
+  // Add keyboard shortcut to reset banner: Ctrl+Shift+B
+  document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.shiftKey && e.key === 'B') {
+      resetBanner('promotion-banner-{{ block.id }}');
+      console.log('Banner reset via keyboard shortcut (Ctrl+Shift+B)');
+    }
   });
 
   // Adjust margin on window resize
@@ -187,7 +222,7 @@
       "type": "checkbox",
       "id": "remember_close",
       "label": "Remember when closed",
-      "default": true,
+      "default": false,
       "info": "If enabled, the banner will stay hidden after the user closes it"
     }
   ]

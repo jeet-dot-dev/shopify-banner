@@ -1,0 +1,11 @@
+{
+  "buildCommand": "prisma generate && prisma migrate deploy && npm run build",
+  "functions": {
+    "build/server/index.js": {
+      "includeFiles": ["node_modules/.prisma/**", "prisma/schema.prisma"]
+    }
+  },
+  "env": {
+    "PRISMA_GENERATE_DATAPROXY": "false"
+  }
+}
