@@ -1,0 +1,195 @@
+{% comment %}
+  Promotional banner block for displaying special offers
+{% endcomment %}
+
+<div class="promotion-banner" id="promotion-banner-{{ block.id }}">
+  <div class="promotion-banner__content">
+    {{ block.settings.banner_text }}
+  </div>
+  {% if block.settings.show_close_button %}
+    <button class="promotion-banner__close" onclick="closeBanner('promotion-banner-{{ block.id }}')">
+      ×
+    </button>
+  {% endif %}
+</div>
+
+<style>
+  .promotion-banner {
+    background-color: {{ block.settings.background_color | default: '#ff6b6b' }};
+    color: {{ block.settings.text_color | default: '#ffffff' }};
+    text-align: center;
+    padding: 12px 20px;
+    font-size: {{ block.settings.font_size | default: '16px' }};
+    font-weight: {{ block.settings.font_weight | default: 'bold' }};
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+  }
+
+  /* Add top margin to body to account for fixed banner */
+  body {
+    margin-top: 60px !important;
+  }
+
+  .promotion-banner__content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .promotion-banner__close {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+  }
+
+  .promotion-banner__close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    .promotion-banner {
+      padding: 10px 50px 10px 20px;
+      font-size: 14px;
+    }
+  }
+</style>
+
+<script>
+  function closeBanner(bannerId) {
+    const banner = document.getElementById(bannerId);
+    if (banner) {
+      banner.style.display = 'none';
+      // Store in localStorage to remember the banner was closed
+      localStorage.setItem('banner-closed-' + bannerId, 'true');
+      // Adjust body margin when banner is closed
+      adjustBodyMargin();
+    }
+  }
+
+  function adjustBodyMargin() {
+    const banner = document.getElementById('promotion-banner-{{ block.id }}');
+    if (banner && banner.style.display !== 'none') {
+      const bannerHeight = banner.offsetHeight;
+      document.body.style.marginTop = bannerHeight + 'px';
+    } else {
+      document.body.style.marginTop = '0px';
+    }
+  }
+
+  // Check if banner was previously closed
+  document.addEventListener('DOMContentLoaded', function() {
+    const bannerId = 'promotion-banner-{{ block.id }}';
+    const wasClosed = localStorage.getItem('banner-closed-' + bannerId);
+    if (wasClosed === 'true' && {{ block.settings.remember_close | json }}) {
+      const banner = document.getElementById(bannerId);
+      if (banner) {
+        banner.style.display = 'none';
+      }
+    }
+    // Adjust body margin on page load
+    setTimeout(adjustBodyMargin, 100);
+  });
+
+  // Adjust margin on window resize
+  window.addEventListener('resize', adjustBodyMargin);
+</script>
+
+{% schema %}
+{
+  "name": "Promotion Banner",
+  "target": "head",
+  "stylesheet": "custom-banner.css",
+  "settings": [
+    {
+      "type": "text",
+      "id": "banner_text",
+      "label": "Banner Text",
+      "default": "🎉 Free Shipping on All Orders! 🎉"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#ff6b6b"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "font_size",
+      "label": "Font Size",
+      "options": [
+        {
+          "value": "14px",
+          "label": "Small"
+        },
+        {
+          "value": "16px",
+          "label": "Medium"
+        },
+        {
+          "value": "18px",
+          "label": "Large"
+        }
+      ],
+      "default": "16px"
+    },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "label": "Font Weight",
+      "options": [
+        {
+          "value": "normal",
+          "label": "Normal"
+        },
+        {
+          "value": "bold",
+          "label": "Bold"
+        }
+      ],
+      "default": "bold"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_close_button",
+      "label": "Show Close Button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "remember_close",
+      "label": "Remember when closed",
+      "default": true,
+      "info": "If enabled, the banner will stay hidden after the user closes it"
+    }
+  ]
+}
+{% endschema %}
