@@ -2,7 +2,7 @@
   "buildCommand": "prisma generate && prisma migrate deploy && npm run build",
   "functions": {
     "build/server/index.js": {
-      "includeFiles": ["node_modules/.prisma/**", "prisma/schema.prisma"]
+      "includeFiles": "node_modules/.prisma/**"
     }
   },
   "env": {
