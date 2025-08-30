@@ -31,7 +31,6 @@
     margin: 0;
   }
 
-  /* Add top margin to body to account for fixed banner */
   body {
     margin-top: 60px !important;
   }
@@ -78,77 +77,69 @@
 </style>
 
 <script>
-  function closeBanner(bannerId) {
-    const banner = document.getElementById(bannerId);
-    if (banner) {
-      banner.style.display = 'none';
-      // Store in localStorage to remember the banner was closed
-      localStorage.setItem('banner-closed-' + bannerId, 'true');
-      // Adjust body margin when banner is closed
-      adjustBodyMargin();
-    }
-  }
-
-  function resetBanner(bannerId) {
-    // Clear localStorage and show banner again
-    localStorage.removeItem('banner-closed-' + bannerId);
-    const banner = document.getElementById(bannerId);
-    if (banner) {
-      banner.style.display = 'block';
-      adjustBodyMargin();
-    }
-  }
-
-  // Add double-click to reset banner (for testing)
-  document.addEventListener('dblclick', function(e) {
-    if (e.ctrlKey || e.metaKey) {
-      resetBanner('promotion-banner-{{ block.id }}');
-      console.log('Banner reset - localStorage cleared');
-    }
-  });
+  const bannerId = 'promotion-banner-{{ block.id }}';
 
   function adjustBodyMargin() {
-    const banner = document.getElementById('promotion-banner-{{ block.id }}');
+    const banner = document.getElementById(bannerId);
     if (banner && banner.style.display !== 'none') {
-      const bannerHeight = banner.offsetHeight;
-      document.body.style.marginTop = bannerHeight + 'px';
+      document.body.style.marginTop = banner.offsetHeight + 'px';
     } else {
       document.body.style.marginTop = '0px';
     }
   }
 
-  // Check if banner was previously closed
-  document.addEventListener('DOMContentLoaded', function() {
-    const bannerId = 'promotion-banner-{{ block.id }}';
-    const wasClosed = localStorage.getItem('banner-closed-' + bannerId);
-    
-    // For debugging: log if banner was previously closed
-    console.log('Banner ID:', bannerId);
-    console.log('Was closed:', wasClosed);
-    console.log('Remember close setting:', {{ block.settings.remember_close | json }});
-    
-    if (wasClosed === 'true' && {{ block.settings.remember_close | json }}) {
-      const banner = document.getElementById(bannerId);
-      if (banner) {
-        banner.style.display = 'none';
-        console.log('Banner hidden due to localStorage');
-      }
-    } else {
-      console.log('Banner should be visible');
+  function closeBanner(id) {
+    const banner = document.getElementById(id);
+    if (!banner) return;
+
+    banner.style.display = 'none';
+    if ({{ block.settings.remember_close | json }}) {
+      localStorage.setItem('banner-closed-' + id, 'true');
     }
-    // Adjust body margin on page load
-    setTimeout(adjustBodyMargin, 100);
+    adjustBodyMargin();
+  }
+
+  function resetBanner(id) {
+    localStorage.removeItem('banner-closed-' + id);
+    const banner = document.getElementById(id);
+    if (!banner) return;
+
+    banner.style.display = 'block';
+    adjustBodyMargin();
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const banner = document.getElementById(bannerId);
+    const wasClosed = localStorage.getItem('banner-closed-' + bannerId);
+
+    if ({{ block.settings.remember_close | json }} && wasClosed === 'true') {
+      if (banner) banner.style.display = 'none';
+      console.log('Banner hidden due to localStorage');
+    } else {
+      if (banner) banner.style.display = 'block';
+      console.log('Banner is visible');
+      localStorage.removeItem('banner-closed-' + bannerId); // clear previous close if remember_close is false
+    }
+
+    adjustBodyMargin();
   });
 
-  // Add keyboard shortcut to reset banner: Ctrl+Shift+B
+  // Double-click + Ctrl/Cmd to reset
+  document.addEventListener('dblclick', function(e) {
+    if (e.ctrlKey || e.metaKey) {
+      resetBanner(bannerId);
+      console.log('Banner reset via double-click');
+    }
+  });
+
+  // Keyboard shortcut Ctrl+Shift+B to reset
   document.addEventListener('keydown', function(e) {
     if (e.ctrlKey && e.shiftKey && e.key === 'B') {
-      resetBanner('promotion-banner-{{ block.id }}');
-      console.log('Banner reset via keyboard shortcut (Ctrl+Shift+B)');
+      resetBanner(bannerId);
+      console.log('Banner reset via keyboard shortcut');
     }
   });
 
-  // Adjust margin on window resize
   window.addEventListener('resize', adjustBodyMargin);
 </script>
 
@@ -181,18 +172,9 @@
       "id": "font_size",
       "label": "Font Size",
       "options": [
-        {
-          "value": "14px",
-          "label": "Small"
-        },
-        {
-          "value": "16px",
-          "label": "Medium"
-        },
-        {
-          "value": "18px",
-          "label": "Large"
-        }
+        {"value": "14px","label": "Small"},
+        {"value": "16px","label": "Medium"},
+        {"value": "18px","label": "Large"}
       ],
       "default": "16px"
     },
@@ -201,14 +183,8 @@
       "id": "font_weight",
       "label": "Font Weight",
       "options": [
-        {
-          "value": "normal",
-          "label": "Normal"
-        },
-        {
-          "value": "bold",
-          "label": "Bold"
-        }
+        {"value": "normal","label": "Normal"},
+        {"value": "bold","label": "Bold"}
       ],
       "default": "bold"
     },
